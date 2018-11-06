@@ -1,0 +1,45 @@
+replicaCount: 1
+strategyType: Recreate
+
+image:
+  repository: quay.io/external_storage/nfs-client-provisioner:latest
+  tag: latest
+  pullPolicy: Always
+
+# 修改nfs地址
+nfs:
+  server: xxx.nas.aliyuncs.com
+  path: /xxx
+
+storageClass:
+  create: true
+  defaultClass: false
+  # name
+  name: redis-storage-class
+  allowVolumeExpansion: true
+  reclaimPolicy: Delete
+  archiveOnDelete: true
+
+rbac:
+  create: true
+
+podSecurityPolicy:
+  enabled: false
+
+serviceAccount:
+  create: true
+  name: redis-storage-class
+
+resources: {}
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

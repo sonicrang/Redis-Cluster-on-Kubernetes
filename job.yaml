@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  namespace: redis
+  name: redis-join
+spec:
+  template:
+    metadata:
+      name: redis-join
+    spec:
+      containers:
+      - name: redis-join
+        image: redis:5
+        command: [ "/bin/sh" ]
+        args:
+        - "-c"
+        - >
+          sleep 30 &&
+          ip_node_0=`getent hosts redis-cluster-0.redis-service.redis.svc.cluster.local | awk '{print $1}'` &&
+          ip_node_1=`getent hosts redis-cluster-1.redis-service.redis.svc.cluster.local | awk '{print $1}'` &&
+          ip_node_2=`getent hosts redis-cluster-2.redis-service.redis.svc.cluster.local | awk '{print $1}'` &&
+          ip_node_3=`getent hosts redis-cluster-3.redis-service.redis.svc.cluster.local | awk '{print $1}'` &&
+          ip_node_4=`getent hosts redis-cluster-4.redis-service.redis.svc.cluster.local | awk '{print $1}'` &&
+          ip_node_5=`getent hosts redis-cluster-5.redis-service.redis.svc.cluster.local | awk '{print $1}'` &&
+          echo 'yes' | redis-cli --cluster create ${ip_node_0}:6379 ${ip_node_1}:6379 ${ip_node_2}:6379 ${ip_node_3}:6379 ${ip_node_4}:6379 ${ip_node_5}:6379 -a Omni2014Ears --cluster-replicas 1 
+      restartPolicy: Never
