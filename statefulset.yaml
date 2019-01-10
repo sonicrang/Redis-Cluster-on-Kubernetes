@@ -24,13 +24,12 @@ spec:
             - name: cluster
               containerPort: 16379
               protocol: TCP
-        command: ["redis-server"]
-        args: ["/etc/redis/redis.conf"]
+        command: ["/etc/redis/fix-ip.sh", "redis-server", "/etc/redis/redis.conf"]
         volumeMounts:
           - name: redis-conf
             mountPath: /etc/redis
           - name: redis-data
-            mountPath: /var/lib/redis
+            mountPath: /data
         resources:
           limits:
             cpu: 0.5
@@ -45,6 +44,9 @@ spec:
           items:
             - key: redis.conf
               path: redis.conf
+            - key: fix-ip.sh
+              path: fix-ip.sh
+          defaultMode: 0755
   volumeClaimTemplates:
   - metadata:
       name: redis-data

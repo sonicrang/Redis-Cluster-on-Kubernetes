@@ -7,15 +7,30 @@ metadata:
   name: redis-cluster-conf
 # maxmemory 设置为 limit.memory 80%
 data:
+  fix-ip.sh: |
+    #!/bin/sh
+    CLUSTER_CONFIG="/data/nodes.conf"
+    if [ -f ${CLUSTER_CONFIG} ]; then
+      if [ -z "${POD_IP}" ]; then 
+        echo "Unable to determine Pod IP address!"
+        exit 1
+      fi
+      echo "Updating my IP to ${POD_IP} in ${CLUSTER_CONFIG}"
+      sed -i.bak -e "/myself/ s/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/${POD_IP}/" ${CLUSTER_CONFIG}
+    fi
+    exec "$@"
   redis.conf: |
     port 6379
     cluster-enabled yes
     cluster-config-file nodes.conf
-    cluster-node-timeout 5000
+    repl-ping-slave-period 10
+    repl-timeout 60
+    cluster-node-timeout 15000
     maxmemory 966367641
     maxmemory-policy noeviction 
     appendonly yes
-    appendfsync always 
+    appendfsync everysec 
     tcp-keepalive 60
     protected-mode no
     requirepass xxxxx
+    masterauth  xxxxx
